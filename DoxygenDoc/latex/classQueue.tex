@@ -1,0 +1,93 @@
+\hypertarget{classQueue}{}\doxysection{Queue$<$ T $>$ Class Template Reference}
+\label{classQueue}\index{Queue$<$ T $>$@{Queue$<$ T $>$}}
+
+
+A thread safe queue that works as synchronized object.  
+
+
+
+
+{\ttfamily \#include $<$safe\+Queue.\+h$>$}
+
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classQueue_abeee018138cbb5226e5352a5788e23bd}\label{classQueue_abeee018138cbb5226e5352a5788e23bd}} 
+T \mbox{\hyperlink{classQueue_abeee018138cbb5226e5352a5788e23bd}{pop}} ()
+\begin{DoxyCompactList}\small\item\em A template queue constructor. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classQueue_a1fa6d59972ff7e2d7df28230e89f2f6b}{pop}} (T \&item)
+\item 
+void \mbox{\hyperlink{classQueue_a77ab2e7fdc5666c86bec326671b2157b}{push}} (const T \&item)
+\item 
+void \mbox{\hyperlink{classQueue_a1bad9e15248ce048d2988b8eecc20846}{push}} (T \&\&item)
+\item 
+bool \mbox{\hyperlink{classQueue_a515bd72c9d7d2bc12add78c0d2e79762}{is\+Empty}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename T$>$\newline
+class Queue$<$ T $>$}
+
+A thread safe queue that works as synchronized object. 
+
+It is a template queue with thread safe mechanism T\+CP client will listen to the socket and produce message to the queue Another thread will pop out queue and handle the message 
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classQueue_a515bd72c9d7d2bc12add78c0d2e79762}\label{classQueue_a515bd72c9d7d2bc12add78c0d2e79762}} 
+\index{Queue$<$ T $>$@{Queue$<$ T $>$}!isEmpty@{isEmpty}}
+\index{isEmpty@{isEmpty}!Queue$<$ T $>$@{Queue$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{isEmpty()}{isEmpty()}}
+{\footnotesize\ttfamily template$<$typename T $>$ \\
+bool \mbox{\hyperlink{classQueue}{Queue}}$<$ T $>$\+::is\+Empty (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+check if the queue is empty \begin{DoxyReturn}{Returns}
+If the queue is empty 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classQueue_a1fa6d59972ff7e2d7df28230e89f2f6b}\label{classQueue_a1fa6d59972ff7e2d7df28230e89f2f6b}} 
+\index{Queue$<$ T $>$@{Queue$<$ T $>$}!pop@{pop}}
+\index{pop@{pop}!Queue$<$ T $>$@{Queue$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{pop()}{pop()}}
+{\footnotesize\ttfamily template$<$typename T $>$ \\
+void \mbox{\hyperlink{classQueue}{Queue}}$<$ T $>$\+::pop (\begin{DoxyParamCaption}\item[{T \&}]{item }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Pop the first data in the queue to the item reference
+
+
+\begin{DoxyParams}{Parameters}
+{\em item} & The reference of where we want the pop value be popped \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classQueue_a77ab2e7fdc5666c86bec326671b2157b}\label{classQueue_a77ab2e7fdc5666c86bec326671b2157b}} 
+\index{Queue$<$ T $>$@{Queue$<$ T $>$}!push@{push}}
+\index{push@{push}!Queue$<$ T $>$@{Queue$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{push()}{push()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$typename T $>$ \\
+void \mbox{\hyperlink{classQueue}{Queue}}$<$ T $>$\+::push (\begin{DoxyParamCaption}\item[{const T \&}]{item }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Push the value of the item to the queue
+
+
+\begin{DoxyParams}{Parameters}
+{\em item} & The item value need to be pushed to the server \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classQueue_a1bad9e15248ce048d2988b8eecc20846}\label{classQueue_a1bad9e15248ce048d2988b8eecc20846}} 
+\index{Queue$<$ T $>$@{Queue$<$ T $>$}!push@{push}}
+\index{push@{push}!Queue$<$ T $>$@{Queue$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{push()}{push()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$typename T $>$ \\
+void \mbox{\hyperlink{classQueue}{Queue}}$<$ T $>$\+::push (\begin{DoxyParamCaption}\item[{T \&\&}]{item }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Push the address of item to the queue
+
+
+\begin{DoxyParams}{Parameters}
+{\em item} & The address need to be pushed to the queue \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+safe\+Queue.\+h\end{DoxyCompactItemize}

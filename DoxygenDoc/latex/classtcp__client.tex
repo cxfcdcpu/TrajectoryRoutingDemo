@@ -1,0 +1,130 @@
+\hypertarget{classtcp__client}{}\doxysection{tcp\+\_\+client Class Reference}
+\label{classtcp__client}\index{tcp\_client@{tcp\_client}}
+
+
+T\+CP Client class.  
+
+
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtcp__client_ada4d6bbed47dcc4f34ece40f12aca4c2}{tcp\+\_\+client}} ()
+\item 
+bool \mbox{\hyperlink{classtcp__client_a6d26ed09fa5b2483969356e77d59b442}{conn}} (string, int)
+\item 
+\mbox{\Hypertarget{classtcp__client_ab0e3d01c59501a4f950cde094b91b62b}\label{classtcp__client_ab0e3d01c59501a4f950cde094b91b62b}} 
+void \mbox{\hyperlink{classtcp__client_ab0e3d01c59501a4f950cde094b91b62b}{listen\+String}} ()
+\begin{DoxyCompactList}\small\item\em create a thread that listening to the server message queue \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classtcp__client_ad279d9fc89d84aa77e235edb5367d15c}\label{classtcp__client_ad279d9fc89d84aa77e235edb5367d15c}} 
+void \mbox{\hyperlink{classtcp__client_ad279d9fc89d84aa77e235edb5367d15c}{repeat\+Send}} ()
+\begin{DoxyCompactList}\small\item\em create a thread that repeatly send a heartbeat message to the server \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classtcp__client_a51d57e1c505eb81a4f2f67ced107993e}\label{classtcp__client_a51d57e1c505eb81a4f2f67ced107993e}} 
+void \mbox{\hyperlink{classtcp__client_a51d57e1c505eb81a4f2f67ced107993e}{computation\+Queue\+Handle}} ()
+\begin{DoxyCompactList}\small\item\em create a thread that listen to the computation request queue \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classtcp__client_a96d8350bfb87a9b50c9b1257d9dfbbd1}{send\+\_\+data}} (string data)
+\item 
+void \mbox{\hyperlink{classtcp__client_ad901f070f4108c057779ed14a3ea5dfb}{add\+Data}} (string data)
+\item 
+void \mbox{\hyperlink{classtcp__client_a7b71092af2013c48dee09e5534bbaac9}{setup\+T\+AS}} (string tmp\+ID, int epoch, string request\+ID, int total\+Stroke)
+\item 
+void \mbox{\hyperlink{classtcp__client_aab6e4cb20b521c94099ff5d2a846e71b}{receive}} (char buf\mbox{[}$\,$\mbox{]})
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classtcp__client_a702a003651f382a3b6118b087af78398}\label{classtcp__client_a702a003651f382a3b6118b087af78398}} 
+\mbox{\hyperlink{classQueue}{Queue}}$<$ string $>$ \mbox{\hyperlink{classtcp__client_a702a003651f382a3b6118b087af78398}{string\+Queue}}
+\begin{DoxyCompactList}\small\item\em thread safe queue for input from server. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classtcp__client_ab0320d85f36fed8e764ecf788f2a56f0}\label{classtcp__client_ab0320d85f36fed8e764ecf788f2a56f0}} 
+\mbox{\hyperlink{classQueue}{Queue}}$<$ string $>$ \mbox{\hyperlink{classtcp__client_ab0320d85f36fed8e764ecf788f2a56f0}{computing\+Queue}}
+\begin{DoxyCompactList}\small\item\em thread safe queue for computation request \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+T\+CP Client class. 
+
+A c++ T\+CP client that connect to T\+CP server. The goal of this service is to handle computational request. Encoding routing trajectory as the user request. 
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classtcp__client_ada4d6bbed47dcc4f34ece40f12aca4c2}\label{classtcp__client_ada4d6bbed47dcc4f34ece40f12aca4c2}} 
+\index{tcp\_client@{tcp\_client}!tcp\_client@{tcp\_client}}
+\index{tcp\_client@{tcp\_client}!tcp\_client@{tcp\_client}}
+\doxysubsubsection{\texorpdfstring{tcp\_client()}{tcp\_client()}}
+{\footnotesize\ttfamily tcp\+\_\+client\+::tcp\+\_\+client (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Initialize tcp client 
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classtcp__client_ad901f070f4108c057779ed14a3ea5dfb}\label{classtcp__client_ad901f070f4108c057779ed14a3ea5dfb}} 
+\index{tcp\_client@{tcp\_client}!addData@{addData}}
+\index{addData@{addData}!tcp\_client@{tcp\_client}}
+\doxysubsubsection{\texorpdfstring{addData()}{addData()}}
+{\footnotesize\ttfamily void tcp\+\_\+client\+::add\+Data (\begin{DoxyParamCaption}\item[{string}]{data }\end{DoxyParamCaption})}
+
+Parse the data from the server. update the sensor network for the users 
+\begin{DoxyParams}{Parameters}
+{\em data} & The data from the server \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classtcp__client_a6d26ed09fa5b2483969356e77d59b442}\label{classtcp__client_a6d26ed09fa5b2483969356e77d59b442}} 
+\index{tcp\_client@{tcp\_client}!conn@{conn}}
+\index{conn@{conn}!tcp\_client@{tcp\_client}}
+\doxysubsubsection{\texorpdfstring{conn()}{conn()}}
+{\footnotesize\ttfamily bool tcp\+\_\+client\+::conn (\begin{DoxyParamCaption}\item[{string}]{address,  }\item[{int}]{port }\end{DoxyParamCaption})}
+
+Returns if the connection success
+
+
+\begin{DoxyParams}{Parameters}
+{\em IP} & of the server \\
+\hline
+{\em Port} & of the server \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+if connection established
+\end{DoxyReturn}
+Connect to a host on a certain port number \mbox{\Hypertarget{classtcp__client_aab6e4cb20b521c94099ff5d2a846e71b}\label{classtcp__client_aab6e4cb20b521c94099ff5d2a846e71b}} 
+\index{tcp\_client@{tcp\_client}!receive@{receive}}
+\index{receive@{receive}!tcp\_client@{tcp\_client}}
+\doxysubsubsection{\texorpdfstring{receive()}{receive()}}
+{\footnotesize\ttfamily void tcp\+\_\+client\+::receive (\begin{DoxyParamCaption}\item[{char}]{buffer\mbox{[}$\,$\mbox{]} }\end{DoxyParamCaption})}
+
+Receive data from the connected host \mbox{\Hypertarget{classtcp__client_a96d8350bfb87a9b50c9b1257d9dfbbd1}\label{classtcp__client_a96d8350bfb87a9b50c9b1257d9dfbbd1}} 
+\index{tcp\_client@{tcp\_client}!send\_data@{send\_data}}
+\index{send\_data@{send\_data}!tcp\_client@{tcp\_client}}
+\doxysubsubsection{\texorpdfstring{send\_data()}{send\_data()}}
+{\footnotesize\ttfamily bool tcp\+\_\+client\+::send\+\_\+data (\begin{DoxyParamCaption}\item[{string}]{data }\end{DoxyParamCaption})}
+
+Returns if sent data to the server successfully
+
+
+\begin{DoxyParams}{Parameters}
+{\em data} & The data need to be sent to the server \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+If the data be sent to the server succefully
+\end{DoxyReturn}
+Send data to the connected host \mbox{\Hypertarget{classtcp__client_a7b71092af2013c48dee09e5534bbaac9}\label{classtcp__client_a7b71092af2013c48dee09e5534bbaac9}} 
+\index{tcp\_client@{tcp\_client}!setupTAS@{setupTAS}}
+\index{setupTAS@{setupTAS}!tcp\_client@{tcp\_client}}
+\doxysubsubsection{\texorpdfstring{setupTAS()}{setupTAS()}}
+{\footnotesize\ttfamily void tcp\+\_\+client\+::setup\+T\+AS (\begin{DoxyParamCaption}\item[{string}]{tmp\+ID,  }\item[{int}]{epoch,  }\item[{string}]{request\+ID,  }\item[{int}]{total\+Stroke }\end{DoxyParamCaption})}
+
+Update the Trajectory area set of the wireless sensor networks(\+T\+A\+S). 
+\begin{DoxyParams}{Parameters}
+{\em tmp\+ID} & The user ID currently updating the T\+AS \\
+\hline
+{\em epoch} & The epoch of the update \\
+\hline
+{\em request\+ID} & The request ID for that user \\
+\hline
+{\em total\+Stroke} & The total length of the trajectory in \# of strokes \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+cpp\+Client.\+cpp\end{DoxyCompactItemize}

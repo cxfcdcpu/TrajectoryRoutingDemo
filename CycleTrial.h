@@ -28,21 +28,40 @@
 #include "Point.h"
 using namespace std;
 
-
+//!A two cycle constraints. 
+/**
+  
+  It contains two cycle information including the overlapping area.
+  Detail about two cycle constraints can be seen in:
+  https://ieeexplore.ieee.org/abstract/document/8935061
+*/
 struct twoCycleTrial
 {
+  ///Center one's ID
   int c1ID;
+  ///Center two's ID
   int c2ID; 
+  ///X coordinate of center one
   float c1X;
+  ///Y coordinate of center one
   float c1Y;
+  ///X coordinate of center two
   float c2X;
+  ///Y coordinate of center two
   float c2Y;
+  ///circle one's radius in hops
   float h1;
+  ///circle two's radius in hops
   float h2;
+  ///average distance of each hop
   float d;
+  ///mathematic calculated overlapping area of two circles
   float tArea;
+  /// rate3 * acAr
   float grAr;
+  /// (acAr / tArea)^3
   float rate3;
+  ///tested overlapping area of two circles and TAS
   float acAr;
 };
 

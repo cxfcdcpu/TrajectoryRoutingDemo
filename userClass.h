@@ -54,11 +54,18 @@
 
 
 using namespace std;
+//!An object that represent an user of the software
+/**
+A user that has ID, a WSN topology and information, the trajectory area set (TAS).
+Use the above information, we can find the encoded trajectory using proposed algorithm in:
+https://ieeexplore.ieee.org/abstract/document/8935061
 
+*/
 class User
 {
   
   private:
+    
     string id;
     int nodes;
     int anchor;
@@ -74,8 +81,11 @@ class User
     int totalStroke;
     
   public:
+    ///The Trajectory area set, it is the user defined trajectory.
     unordered_set<string> TAS;
+    ///Map request ID and encoded trajecotry ID
     map<string,string> resultMap;
+    ///A constructor
     User():xList(),yList()
     {
         id="none";
@@ -97,6 +107,12 @@ class User
         }
     
     }
+    ///A constructor with ID as input
+    /**
+		  construct an User instance
+
+		  @param i The ID of the user
+		*/
     User(string i):xList(),yList()
     {
         id=i;
@@ -117,29 +133,162 @@ class User
           yList[i]=rand()%height;
         }
     }
+    /**
+		  set the number of nodes in the Wireless sensor networks (WSNs).
+
+		  @param n The number of sensor nodes
+		*/
     void setNodes(int n){nodes=n;}
+    /**
+		  set the number of anchor nodes in the Wireless sensor networks (WSNs).
+
+		  @param a The number of anchor nodes
+		*/
     void setAnchor(int a){anchor=a;}
+    /**
+		  set the radio range of the Wireless sensor networks (WSNs).
+
+		  @param r The radio range of sensor nodes
+		*/
     void setRange(int r){radioRange=r;}
+    /**
+		  set the epoch (like an ID) of the request of the user
+
+		  @param e The epoch of the request
+		*/
     void setEpoch(int e){epoch=e;}
+    /**
+		  set the x coordinate of the i'th nodes
+
+		  @param v The value of the x coordinate
+		*/
     void setX(int i, int v){xList[i]=v;}
+    /**
+		  set the y coordinate of the i'th nodes
+
+		  @param v The value of the y coordinate
+		*/
     void setY(int i, int v){yList[i]=v;}
+    /**
+		  set the x and y coordinate of the ind'th trajectory points
+		  Note: A trajectory can be draw with connected trajectory points.
+
+		  @param x The value of the x coordinate
+		  @param y The value of the y coordinate
+		  @param ind The index of the ind'th trajectory
+		*/
     void setTraj(int x, int y, int ind){tx[ind]=x;ty[ind]=y;}
+    /**
+		  Returns the number of nodes in the WSNs
+
+		   
+		  @return the number of nodes in the WSNs
+		*/
     int getNodes(){return nodes;}
+    /**
+		  Returns the number of anchor nodes in the WSNs
+
+		   
+		  @return the number of anchor nodes in the WSNs
+		*/
     int getAnchor(){return anchor;}
+    /**
+		  Returns the radio range of sensors
+
+		   
+		  @return the radio range of sensors
+		*/
     int getRange(){return radioRange;}
+    /**
+		  Returns the current epoch
+
+		   
+		  @return the current epoch
+		*/
     int getEpoch(){return epoch;}
+    /**
+		  Get the x coordinate of sensor node i
+
+		  @param i The ID of the sensor we want to get X coordinate from 
+		  @return x coordinate of sensor node i
+		*/
     int getX(int i){return xList[i];}
+    /**
+		  Get the y coordinate of sensor node i
+
+		  @param i The ID of the sensor we want to get y coordinate from 
+		  @return y coordinate of sensor node i
+		*/
     int getY(int i){return yList[i];}
+    /**
+		  Create the TAS from the stroke points
+
+		  @param totalStroke The number of stroke points of a trajectory.
+		*/
     void genTAS(int totalStroke);
+    /**
+		  Add a stroke point and it's current segment's width
+
+		  @param p The stroke points of a trajectory.
+		  @param width The width of current segment of trajectory.
+		*/
     void addToTAS(Point p, int width);
+    /**
+		  Add two stroke points and it's current segment's width
+
+		  @param p1 The stroke points of a trajectory.
+		  @param p2 The stroke points of a trajectory.
+		  @param width The width of current segment of trajectory.
+		*/
     void addToTAS(Point p1, Point p2, int width);
+    ///Print the TAS area in pixel square 
     void printArea();
+    /**
+		  find all possible two cycle constraints and calculate the overlapping area
+
+		  @param hv The DV-Hop of all nodes in the WSNs
+		  @return all possible two cycle constraints twoCycleTrial
+		*/
     vector<twoCycleTrial> findTwoCycleTrial(short hv[][anchorSize]);
+    /**
+		  find all possible hyperbola and circle constraints and calculate the overlapping area
+      using multi thread to speed up the calculation.
+      
+		  @param hv The DV-Hop of all nodes in the WSNs
+		  @return all possible hyperbola and circle constraints hyperTrial
+		*/
     vector<hyperTrial> findHyperTrial(short hv[][anchorSize]);
-    vector<hyperTrial> hyperHelper(short hv[][anchorSize], int, int);
+    /**
+		  find all hyperbola and circle constraint and calculate the overlapping area given ah and h3
+      
+		  @param hv The DV-Hop of all nodes in the WSNs
+		  @param ah The hop count of 'a' of the hyperbola
+		  @param h3 The radius of the circle.
+		  @return all possible hyperbola and circle constraints hyperTrial
+		*/
+    vector<hyperTrial> hyperHelper(short hv[][anchorSize], int ah, int h3);
+    /**
+		  find all possible ellipse and circle constraints and calculate the overlapping area
+      using multi thread to speed up the calculation.
+      
+		  @param hv The DV-Hop of all nodes in the WSNs
+		  @return all possible ellipse and circle constraints ellipseTrial
+		*/
     vector<ellipseTrial> findEllipseTrial(short hv[][anchorSize]);
+    /**
+		  find all ellipse and circle constraint and calculate the overlapping area given ah and h3
+      
+		  @param hv The DV-Hop of all nodes in the WSNs
+		  @param ah The hop count of 'a' of the ellipse
+		  @param h3 The radius of the circle.
+		  @return all possible ellipse and circle constraints ellipseTrial
+		*/
     vector<ellipseTrial>  ellipseHelper(short hv[][anchorSize],int  ah,int  h3);
-    
+    /**
+		  update the DV hop information to hv
+      
+      @param hv The DV-Hop of all nodes in the WSNs
+    */
     void getHopInfo(short hv[][anchorSize]);
     //void updataHopVector();
 };

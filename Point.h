@@ -26,6 +26,10 @@
 #include <sstream>
 using namespace std;
 
+//!A point objectory that represent sensor's location
+/**
+  The x and y coordinate should be integer. Which is different from Point2
+*/
 struct Point
 {
   int m_X;

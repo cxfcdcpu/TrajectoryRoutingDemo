@@ -32,6 +32,11 @@
 #include <complex>
 #include "quartic.h"
 #include <algorithm>
+
+//!A point objectory that used to calculate geometry property of circle, hyperbola and ellipse
+/**
+  The x and y coordinate should be double. Which is different from Point
+*/
 struct Point2
 {
   double m_X;

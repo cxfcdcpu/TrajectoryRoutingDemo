@@ -1,0 +1,417 @@
+\hypertarget{classUser}{}\doxysection{User Class Reference}
+\label{classUser}\index{User@{User}}
+
+
+An object that represent an user of the software.  
+
+
+
+
+{\ttfamily \#include $<$user\+Class.\+h$>$}
+
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classUser_a4a0137053e591fbb79d9057dd7d2283d}\label{classUser_a4a0137053e591fbb79d9057dd7d2283d}} 
+\mbox{\hyperlink{classUser_a4a0137053e591fbb79d9057dd7d2283d}{User}} ()
+\begin{DoxyCompactList}\small\item\em A constructor. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classUser_a46eaf9d73d634b8cd4806f7d95a2aa01}{User}} (string i)
+\begin{DoxyCompactList}\small\item\em A constructor with ID as input. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classUser_a40fe025c8d4fb51c455ec87ad9b305f3}{set\+Nodes}} (int n)
+\item 
+void \mbox{\hyperlink{classUser_ae3f74c1c8995de3593263a6e99043e01}{set\+Anchor}} (int a)
+\item 
+void \mbox{\hyperlink{classUser_a9653d651c1f5ff9bffa57f5128d01729}{set\+Range}} (int r)
+\item 
+void \mbox{\hyperlink{classUser_ae30add5538340b118a3367f6ec626ed8}{set\+Epoch}} (int e)
+\item 
+void \mbox{\hyperlink{classUser_a149ca7a78e7e3e23ca5297a29b35ed1e}{setX}} (int i, int v)
+\item 
+void \mbox{\hyperlink{classUser_a5452d197fba52653415f551a809098b9}{setY}} (int i, int v)
+\item 
+void \mbox{\hyperlink{classUser_ab1b5384bc83e08ec7d3dcb9d53bca3a2}{set\+Traj}} (int x, int y, int ind)
+\item 
+int \mbox{\hyperlink{classUser_a86bbdf9a84863e273a1526936e7f804c}{get\+Nodes}} ()
+\item 
+int \mbox{\hyperlink{classUser_a277eabcf2f4103530f75a71b7dd5df59}{get\+Anchor}} ()
+\item 
+int \mbox{\hyperlink{classUser_a7510d50e951c17ad48a4e889fcc354e5}{get\+Range}} ()
+\item 
+int \mbox{\hyperlink{classUser_a688b142d951ee775bb866b4fd340c3d2}{get\+Epoch}} ()
+\item 
+int \mbox{\hyperlink{classUser_a194bf2c9332b1992f6fe2ab1a0590f26}{getX}} (int i)
+\item 
+int \mbox{\hyperlink{classUser_a2edde1b954129460d3c4ce9c7edfa918}{getY}} (int i)
+\item 
+void \mbox{\hyperlink{classUser_a0910d912db63badde500906c9878034e}{gen\+T\+AS}} (int total\+Stroke)
+\item 
+void \mbox{\hyperlink{classUser_ad4680dcf7b989d1f6380712ed7486a52}{add\+To\+T\+AS}} (\mbox{\hyperlink{structPoint}{Point}} p, int width)
+\item 
+void \mbox{\hyperlink{classUser_a4f6ea03552d923cf0fbfc4d70723207b}{add\+To\+T\+AS}} (\mbox{\hyperlink{structPoint}{Point}} p1, \mbox{\hyperlink{structPoint}{Point}} p2, int width)
+\item 
+\mbox{\Hypertarget{classUser_ac97f9fca23d0e848beeda7b9d3513c65}\label{classUser_ac97f9fca23d0e848beeda7b9d3513c65}} 
+void \mbox{\hyperlink{classUser_ac97f9fca23d0e848beeda7b9d3513c65}{print\+Area}} ()
+\begin{DoxyCompactList}\small\item\em Print the T\+AS area in pixel square. \end{DoxyCompactList}\item 
+vector$<$ \mbox{\hyperlink{structtwoCycleTrial}{two\+Cycle\+Trial}} $>$ \mbox{\hyperlink{classUser_a069e41e76e5b60a928038502034df882}{find\+Two\+Cycle\+Trial}} (short hv\mbox{[}$\,$\mbox{]}\mbox{[}anchor\+Size\mbox{]})
+\item 
+vector$<$ \mbox{\hyperlink{structhyperTrial}{hyper\+Trial}} $>$ \mbox{\hyperlink{classUser_ad841e6fbb1eb7138e13d7e754be88f6c}{find\+Hyper\+Trial}} (short hv\mbox{[}$\,$\mbox{]}\mbox{[}anchor\+Size\mbox{]})
+\item 
+vector$<$ \mbox{\hyperlink{structhyperTrial}{hyper\+Trial}} $>$ \mbox{\hyperlink{classUser_a41f736374fd5b9716d9e3af8b5029065}{hyper\+Helper}} (short hv\mbox{[}$\,$\mbox{]}\mbox{[}anchor\+Size\mbox{]}, int ah, int h3)
+\item 
+vector$<$ \mbox{\hyperlink{structellipseTrial}{ellipse\+Trial}} $>$ \mbox{\hyperlink{classUser_a084ead2afdbe350556d75c0ff8dae5f0}{find\+Ellipse\+Trial}} (short hv\mbox{[}$\,$\mbox{]}\mbox{[}anchor\+Size\mbox{]})
+\item 
+vector$<$ \mbox{\hyperlink{structellipseTrial}{ellipse\+Trial}} $>$ \mbox{\hyperlink{classUser_a878f36edbd643f793da304459ec6f172}{ellipse\+Helper}} (short hv\mbox{[}$\,$\mbox{]}\mbox{[}anchor\+Size\mbox{]}, int ah, int h3)
+\item 
+void \mbox{\hyperlink{classUser_aff06b72e202f98803dca2067a2a0f6a4}{get\+Hop\+Info}} (short hv\mbox{[}$\,$\mbox{]}\mbox{[}anchor\+Size\mbox{]})
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classUser_ab71e464e1343ba71e7edd2bdf9758dba}\label{classUser_ab71e464e1343ba71e7edd2bdf9758dba}} 
+unordered\+\_\+set$<$ string $>$ \mbox{\hyperlink{classUser_ab71e464e1343ba71e7edd2bdf9758dba}{T\+AS}}
+\begin{DoxyCompactList}\small\item\em The Trajectory area set, it is the user defined trajectory. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classUser_a202a216fe3b24ce27693e0de6ff99880}\label{classUser_a202a216fe3b24ce27693e0de6ff99880}} 
+map$<$ string, string $>$ \mbox{\hyperlink{classUser_a202a216fe3b24ce27693e0de6ff99880}{result\+Map}}
+\begin{DoxyCompactList}\small\item\em Map request ID and encoded trajecotry ID. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+An object that represent an user of the software. 
+
+A user that has ID, a W\+SN topology and information, the trajectory area set (T\+AS). Use the above information, we can find the encoded trajectory using proposed algorithm in\+: \href{https://ieeexplore.ieee.org/abstract/document/8935061}{\texttt{ https\+://ieeexplore.\+ieee.\+org/abstract/document/8935061}} 
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classUser_a46eaf9d73d634b8cd4806f7d95a2aa01}\label{classUser_a46eaf9d73d634b8cd4806f7d95a2aa01}} 
+\index{User@{User}!User@{User}}
+\index{User@{User}!User@{User}}
+\doxysubsubsection{\texorpdfstring{User()}{User()}}
+{\footnotesize\ttfamily User\+::\+User (\begin{DoxyParamCaption}\item[{string}]{i }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+A constructor with ID as input. 
+
+construct an \mbox{\hyperlink{classUser}{User}} instance
+
+
+\begin{DoxyParams}{Parameters}
+{\em i} & The ID of the user \\
+\hline
+\end{DoxyParams}
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classUser_ad4680dcf7b989d1f6380712ed7486a52}\label{classUser_ad4680dcf7b989d1f6380712ed7486a52}} 
+\index{User@{User}!addToTAS@{addToTAS}}
+\index{addToTAS@{addToTAS}!User@{User}}
+\doxysubsubsection{\texorpdfstring{addToTAS()}{addToTAS()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void User\+::add\+To\+T\+AS (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structPoint}{Point}}}]{p,  }\item[{int}]{width }\end{DoxyParamCaption})}
+
+Add a stroke point and it\textquotesingle{}s current segment\textquotesingle{}s width
+
+
+\begin{DoxyParams}{Parameters}
+{\em p} & The stroke points of a trajectory. \\
+\hline
+{\em width} & The width of current segment of trajectory. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classUser_a4f6ea03552d923cf0fbfc4d70723207b}\label{classUser_a4f6ea03552d923cf0fbfc4d70723207b}} 
+\index{User@{User}!addToTAS@{addToTAS}}
+\index{addToTAS@{addToTAS}!User@{User}}
+\doxysubsubsection{\texorpdfstring{addToTAS()}{addToTAS()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void User\+::add\+To\+T\+AS (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structPoint}{Point}}}]{p1,  }\item[{\mbox{\hyperlink{structPoint}{Point}}}]{p2,  }\item[{int}]{width }\end{DoxyParamCaption})}
+
+Add two stroke points and it\textquotesingle{}s current segment\textquotesingle{}s width
+
+
+\begin{DoxyParams}{Parameters}
+{\em p1} & The stroke points of a trajectory. \\
+\hline
+{\em p2} & The stroke points of a trajectory. \\
+\hline
+{\em width} & The width of current segment of trajectory. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classUser_a878f36edbd643f793da304459ec6f172}\label{classUser_a878f36edbd643f793da304459ec6f172}} 
+\index{User@{User}!ellipseHelper@{ellipseHelper}}
+\index{ellipseHelper@{ellipseHelper}!User@{User}}
+\doxysubsubsection{\texorpdfstring{ellipseHelper()}{ellipseHelper()}}
+{\footnotesize\ttfamily vector$<$ \mbox{\hyperlink{structellipseTrial}{ellipse\+Trial}} $>$ User\+::ellipse\+Helper (\begin{DoxyParamCaption}\item[{short}]{hv\mbox{[}$\,$\mbox{]}\mbox{[}anchor\+Size\mbox{]},  }\item[{int}]{ah,  }\item[{int}]{h3 }\end{DoxyParamCaption})}
+
+find all ellipse and circle constraint and calculate the overlapping area given ah and h3
+
+
+\begin{DoxyParams}{Parameters}
+{\em hv} & The D\+V-\/\+Hop of all nodes in the W\+S\+Ns \\
+\hline
+{\em ah} & The hop count of \textquotesingle{}a\textquotesingle{} of the ellipse \\
+\hline
+{\em h3} & The radius of the circle. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+all possible ellipse and circle constraints \mbox{\hyperlink{structellipseTrial}{ellipse\+Trial}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classUser_a084ead2afdbe350556d75c0ff8dae5f0}\label{classUser_a084ead2afdbe350556d75c0ff8dae5f0}} 
+\index{User@{User}!findEllipseTrial@{findEllipseTrial}}
+\index{findEllipseTrial@{findEllipseTrial}!User@{User}}
+\doxysubsubsection{\texorpdfstring{findEllipseTrial()}{findEllipseTrial()}}
+{\footnotesize\ttfamily vector$<$ \mbox{\hyperlink{structellipseTrial}{ellipse\+Trial}} $>$ User\+::find\+Ellipse\+Trial (\begin{DoxyParamCaption}\item[{short}]{hv\mbox{[}$\,$\mbox{]}\mbox{[}anchor\+Size\mbox{]} }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}find all possible ellipse and circle constraints and calculate the overlapping area
+\end{DoxyVerb}
+ using multi thread to speed up the calculation. \begin{DoxyVerb}@param hv The DV-Hop of all nodes in the WSNs
+@return all possible ellipse and circle constraints ellipseTrial
+\end{DoxyVerb}
+ \mbox{\Hypertarget{classUser_ad841e6fbb1eb7138e13d7e754be88f6c}\label{classUser_ad841e6fbb1eb7138e13d7e754be88f6c}} 
+\index{User@{User}!findHyperTrial@{findHyperTrial}}
+\index{findHyperTrial@{findHyperTrial}!User@{User}}
+\doxysubsubsection{\texorpdfstring{findHyperTrial()}{findHyperTrial()}}
+{\footnotesize\ttfamily vector$<$ \mbox{\hyperlink{structhyperTrial}{hyper\+Trial}} $>$ User\+::find\+Hyper\+Trial (\begin{DoxyParamCaption}\item[{short}]{hv\mbox{[}$\,$\mbox{]}\mbox{[}anchor\+Size\mbox{]} }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}find all possible hyperbola and circle constraints and calculate the overlapping area
+\end{DoxyVerb}
+ using multi thread to speed up the calculation. \begin{DoxyVerb}@param hv The DV-Hop of all nodes in the WSNs
+@return all possible hyperbola and circle constraints hyperTrial
+\end{DoxyVerb}
+ \mbox{\Hypertarget{classUser_a069e41e76e5b60a928038502034df882}\label{classUser_a069e41e76e5b60a928038502034df882}} 
+\index{User@{User}!findTwoCycleTrial@{findTwoCycleTrial}}
+\index{findTwoCycleTrial@{findTwoCycleTrial}!User@{User}}
+\doxysubsubsection{\texorpdfstring{findTwoCycleTrial()}{findTwoCycleTrial()}}
+{\footnotesize\ttfamily vector$<$ \mbox{\hyperlink{structtwoCycleTrial}{two\+Cycle\+Trial}} $>$ User\+::find\+Two\+Cycle\+Trial (\begin{DoxyParamCaption}\item[{short}]{hv\mbox{[}$\,$\mbox{]}\mbox{[}anchor\+Size\mbox{]} }\end{DoxyParamCaption})}
+
+find all possible two cycle constraints and calculate the overlapping area
+
+
+\begin{DoxyParams}{Parameters}
+{\em hv} & The D\+V-\/\+Hop of all nodes in the W\+S\+Ns \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+all possible two cycle constraints \mbox{\hyperlink{structtwoCycleTrial}{two\+Cycle\+Trial}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classUser_a0910d912db63badde500906c9878034e}\label{classUser_a0910d912db63badde500906c9878034e}} 
+\index{User@{User}!genTAS@{genTAS}}
+\index{genTAS@{genTAS}!User@{User}}
+\doxysubsubsection{\texorpdfstring{genTAS()}{genTAS()}}
+{\footnotesize\ttfamily void User\+::gen\+T\+AS (\begin{DoxyParamCaption}\item[{int}]{ts }\end{DoxyParamCaption})}
+
+Create the T\+AS from the stroke points
+
+
+\begin{DoxyParams}{Parameters}
+{\em total\+Stroke} & The number of stroke points of a trajectory. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classUser_a277eabcf2f4103530f75a71b7dd5df59}\label{classUser_a277eabcf2f4103530f75a71b7dd5df59}} 
+\index{User@{User}!getAnchor@{getAnchor}}
+\index{getAnchor@{getAnchor}!User@{User}}
+\doxysubsubsection{\texorpdfstring{getAnchor()}{getAnchor()}}
+{\footnotesize\ttfamily int User\+::get\+Anchor (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Returns the number of anchor nodes in the W\+S\+Ns
+
+\begin{DoxyReturn}{Returns}
+the number of anchor nodes in the W\+S\+Ns 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classUser_a688b142d951ee775bb866b4fd340c3d2}\label{classUser_a688b142d951ee775bb866b4fd340c3d2}} 
+\index{User@{User}!getEpoch@{getEpoch}}
+\index{getEpoch@{getEpoch}!User@{User}}
+\doxysubsubsection{\texorpdfstring{getEpoch()}{getEpoch()}}
+{\footnotesize\ttfamily int User\+::get\+Epoch (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Returns the current epoch
+
+\begin{DoxyReturn}{Returns}
+the current epoch 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classUser_aff06b72e202f98803dca2067a2a0f6a4}\label{classUser_aff06b72e202f98803dca2067a2a0f6a4}} 
+\index{User@{User}!getHopInfo@{getHopInfo}}
+\index{getHopInfo@{getHopInfo}!User@{User}}
+\doxysubsubsection{\texorpdfstring{getHopInfo()}{getHopInfo()}}
+{\footnotesize\ttfamily void User\+::get\+Hop\+Info (\begin{DoxyParamCaption}\item[{short}]{hv\mbox{[}$\,$\mbox{]}\mbox{[}anchor\+Size\mbox{]} }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}update the DV hop information to hv
+\end{DoxyVerb}
+
+
+
+\begin{DoxyParams}{Parameters}
+{\em hv} & The D\+V-\/\+Hop of all nodes in the W\+S\+Ns \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classUser_a86bbdf9a84863e273a1526936e7f804c}\label{classUser_a86bbdf9a84863e273a1526936e7f804c}} 
+\index{User@{User}!getNodes@{getNodes}}
+\index{getNodes@{getNodes}!User@{User}}
+\doxysubsubsection{\texorpdfstring{getNodes()}{getNodes()}}
+{\footnotesize\ttfamily int User\+::get\+Nodes (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Returns the number of nodes in the W\+S\+Ns
+
+\begin{DoxyReturn}{Returns}
+the number of nodes in the W\+S\+Ns 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classUser_a7510d50e951c17ad48a4e889fcc354e5}\label{classUser_a7510d50e951c17ad48a4e889fcc354e5}} 
+\index{User@{User}!getRange@{getRange}}
+\index{getRange@{getRange}!User@{User}}
+\doxysubsubsection{\texorpdfstring{getRange()}{getRange()}}
+{\footnotesize\ttfamily int User\+::get\+Range (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Returns the radio range of sensors
+
+\begin{DoxyReturn}{Returns}
+the radio range of sensors 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classUser_a194bf2c9332b1992f6fe2ab1a0590f26}\label{classUser_a194bf2c9332b1992f6fe2ab1a0590f26}} 
+\index{User@{User}!getX@{getX}}
+\index{getX@{getX}!User@{User}}
+\doxysubsubsection{\texorpdfstring{getX()}{getX()}}
+{\footnotesize\ttfamily int User\+::getX (\begin{DoxyParamCaption}\item[{int}]{i }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Get the x coordinate of sensor node i
+
+
+\begin{DoxyParams}{Parameters}
+{\em i} & The ID of the sensor we want to get X coordinate from \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+x coordinate of sensor node i 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classUser_a2edde1b954129460d3c4ce9c7edfa918}\label{classUser_a2edde1b954129460d3c4ce9c7edfa918}} 
+\index{User@{User}!getY@{getY}}
+\index{getY@{getY}!User@{User}}
+\doxysubsubsection{\texorpdfstring{getY()}{getY()}}
+{\footnotesize\ttfamily int User\+::getY (\begin{DoxyParamCaption}\item[{int}]{i }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Get the y coordinate of sensor node i
+
+
+\begin{DoxyParams}{Parameters}
+{\em i} & The ID of the sensor we want to get y coordinate from \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+y coordinate of sensor node i 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classUser_a41f736374fd5b9716d9e3af8b5029065}\label{classUser_a41f736374fd5b9716d9e3af8b5029065}} 
+\index{User@{User}!hyperHelper@{hyperHelper}}
+\index{hyperHelper@{hyperHelper}!User@{User}}
+\doxysubsubsection{\texorpdfstring{hyperHelper()}{hyperHelper()}}
+{\footnotesize\ttfamily vector$<$ \mbox{\hyperlink{structhyperTrial}{hyper\+Trial}} $>$ User\+::hyper\+Helper (\begin{DoxyParamCaption}\item[{short}]{hv\mbox{[}$\,$\mbox{]}\mbox{[}anchor\+Size\mbox{]},  }\item[{int}]{ah,  }\item[{int}]{h3 }\end{DoxyParamCaption})}
+
+find all hyperbola and circle constraint and calculate the overlapping area given ah and h3
+
+
+\begin{DoxyParams}{Parameters}
+{\em hv} & The D\+V-\/\+Hop of all nodes in the W\+S\+Ns \\
+\hline
+{\em ah} & The hop count of \textquotesingle{}a\textquotesingle{} of the hyperbola \\
+\hline
+{\em h3} & The radius of the circle. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+all possible hyperbola and circle constraints \mbox{\hyperlink{structhyperTrial}{hyper\+Trial}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classUser_ae3f74c1c8995de3593263a6e99043e01}\label{classUser_ae3f74c1c8995de3593263a6e99043e01}} 
+\index{User@{User}!setAnchor@{setAnchor}}
+\index{setAnchor@{setAnchor}!User@{User}}
+\doxysubsubsection{\texorpdfstring{setAnchor()}{setAnchor()}}
+{\footnotesize\ttfamily void User\+::set\+Anchor (\begin{DoxyParamCaption}\item[{int}]{a }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+set the number of anchor nodes in the Wireless sensor networks (W\+S\+Ns).
+
+
+\begin{DoxyParams}{Parameters}
+{\em a} & The number of anchor nodes \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classUser_ae30add5538340b118a3367f6ec626ed8}\label{classUser_ae30add5538340b118a3367f6ec626ed8}} 
+\index{User@{User}!setEpoch@{setEpoch}}
+\index{setEpoch@{setEpoch}!User@{User}}
+\doxysubsubsection{\texorpdfstring{setEpoch()}{setEpoch()}}
+{\footnotesize\ttfamily void User\+::set\+Epoch (\begin{DoxyParamCaption}\item[{int}]{e }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+set the epoch (like an ID) of the request of the user
+
+
+\begin{DoxyParams}{Parameters}
+{\em e} & The epoch of the request \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classUser_a40fe025c8d4fb51c455ec87ad9b305f3}\label{classUser_a40fe025c8d4fb51c455ec87ad9b305f3}} 
+\index{User@{User}!setNodes@{setNodes}}
+\index{setNodes@{setNodes}!User@{User}}
+\doxysubsubsection{\texorpdfstring{setNodes()}{setNodes()}}
+{\footnotesize\ttfamily void User\+::set\+Nodes (\begin{DoxyParamCaption}\item[{int}]{n }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+set the number of nodes in the Wireless sensor networks (W\+S\+Ns).
+
+
+\begin{DoxyParams}{Parameters}
+{\em n} & The number of sensor nodes \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classUser_a9653d651c1f5ff9bffa57f5128d01729}\label{classUser_a9653d651c1f5ff9bffa57f5128d01729}} 
+\index{User@{User}!setRange@{setRange}}
+\index{setRange@{setRange}!User@{User}}
+\doxysubsubsection{\texorpdfstring{setRange()}{setRange()}}
+{\footnotesize\ttfamily void User\+::set\+Range (\begin{DoxyParamCaption}\item[{int}]{r }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+set the radio range of the Wireless sensor networks (W\+S\+Ns).
+
+
+\begin{DoxyParams}{Parameters}
+{\em r} & The radio range of sensor nodes \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classUser_ab1b5384bc83e08ec7d3dcb9d53bca3a2}\label{classUser_ab1b5384bc83e08ec7d3dcb9d53bca3a2}} 
+\index{User@{User}!setTraj@{setTraj}}
+\index{setTraj@{setTraj}!User@{User}}
+\doxysubsubsection{\texorpdfstring{setTraj()}{setTraj()}}
+{\footnotesize\ttfamily void User\+::set\+Traj (\begin{DoxyParamCaption}\item[{int}]{x,  }\item[{int}]{y,  }\item[{int}]{ind }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+set the x and y coordinate of the ind\textquotesingle{}th trajectory points Note\+: A trajectory can be draw with connected trajectory points.
+
+
+\begin{DoxyParams}{Parameters}
+{\em x} & The value of the x coordinate \\
+\hline
+{\em y} & The value of the y coordinate \\
+\hline
+{\em ind} & The index of the ind\textquotesingle{}th trajectory \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classUser_a149ca7a78e7e3e23ca5297a29b35ed1e}\label{classUser_a149ca7a78e7e3e23ca5297a29b35ed1e}} 
+\index{User@{User}!setX@{setX}}
+\index{setX@{setX}!User@{User}}
+\doxysubsubsection{\texorpdfstring{setX()}{setX()}}
+{\footnotesize\ttfamily void User\+::setX (\begin{DoxyParamCaption}\item[{int}]{i,  }\item[{int}]{v }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+set the x coordinate of the i\textquotesingle{}th nodes
+
+
+\begin{DoxyParams}{Parameters}
+{\em v} & The value of the x coordinate \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classUser_a5452d197fba52653415f551a809098b9}\label{classUser_a5452d197fba52653415f551a809098b9}} 
+\index{User@{User}!setY@{setY}}
+\index{setY@{setY}!User@{User}}
+\doxysubsubsection{\texorpdfstring{setY()}{setY()}}
+{\footnotesize\ttfamily void User\+::setY (\begin{DoxyParamCaption}\item[{int}]{i,  }\item[{int}]{v }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+set the y coordinate of the i\textquotesingle{}th nodes
+
+
+\begin{DoxyParams}{Parameters}
+{\em v} & The value of the y coordinate \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+user\+Class.\+h\end{DoxyCompactItemize}

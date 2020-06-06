@@ -1,0 +1,1091 @@
+/***************************************************************************
+ *   Copyright (C) 2020 by Xiaofei Cao                                     *
+ *   xiaofeicao0@gmail.com                                                 *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *   ( http://www.gnu.org/licenses/gpl-3.0.en.html )                       *
+ *									   *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
+#include<iostream>	//cout
+#include<stdio.h>	//printf
+#include<string.h>	//strlen
+#include<string>	//string
+#include<cstring>
+#include<sys/socket.h>	//socket
+#include<arpa/inet.h>	//inet_addr
+#include<netdb.h>	//hostent
+#include<stdlib.h>
+#include "allConstant.h"
+#include <unistd.h>
+#include <thread>
+#include <chrono> 
+#include "safeQueue.h"
+#include "quartic.h"
+#include <map>
+#include <sstream> 
+#include <iterator>
+#include <unordered_set>
+#include <vector>
+#include <math.h>
+#include <future>
+#include <complex>
+#include <algorithm>
+#include "Point.h"
+#include "CycleTrial.h"
+#include "HyperTrial.h"
+#include "generalFunction.h"
+#include "userClass.h"
+#include "EllipseTrial.h"
+
+
+using namespace std;
+
+//!TCP Client class
+/**
+	A c++ TCP client that connect to TCP server.
+	The goal of this service is to handle computational request.
+	Encoding routing trajectory as the user request.
+*/
+class tcp_client
+{
+	private:
+		int sock; ///<sock value
+		std::string address;///<ip address of the server
+		int port; ///<port of the connection of server
+		struct sockaddr_in server;  ///<A server instance
+		
+		
+		
+	public:
+		/**
+		  Initialize tcp client
+		*/
+		tcp_client();
+		Queue<string> stringQueue;///<thread safe queue for input from server.
+		Queue<string> computingQueue;///<thread safe queue for computation request
+		/**
+		  Returns if the connection success
+
+		  @param IP of the server
+		  @param Port of the server
+		  @return if connection established
+		*/
+		bool conn(string, int);
+		///create a thread that listening to the server message queue
+		void listenString();
+		///create a thread that repeatly send a heartbeat message to the server
+		void repeatSend();
+		///create a thread that listen to the computation request queue
+		void computationQueueHandle();
+		/**
+		  Returns if sent data to the server successfully
+
+		  @param data The data need to be sent to the server
+		  @return If the data be sent to the server succefully
+		*/
+		bool send_data(string data);
+		/**
+		  Parse the data from the server. update the sensor network for the users
+		  @param data The data from the server
+		*/
+		void addData(string data);
+		/**
+      Update the Trajectory area set of the wireless sensor networks(TAS).
+		  @param tmpID The user ID currently updating the TAS
+		  @param epoch The epoch of the update
+		  @param requestID The request ID for that user
+		  @param totalStroke The total length of the trajectory in # of strokes
+		*/
+		void setupTAS(string tmpID,int epoch, string requestID,int totalStroke);
+		//listening to the port and receive TCP/IP packets and store in the buf.
+		void receive(char buf[]);
+};
+//initialize tcp client
+tcp_client::tcp_client()
+{
+	sock = -1;
+	port = 0;
+	address = "";
+}
+
+//user hashmap storing user ID and it's cresponding Index in the allUser list
+map<string,int> indexMap;
+//Store all the users in the memory to increase the access speed
+User allUser[userSize];
+//store all users' ID.
+string idList[userSize];
+//current no user
+int userNow=-1;
+/**
+    Returns the index of the current user object in allUser list
+
+    @param tempID, the user ID in string
+    @return the user object index of allUser list
+*/
+int getUser(string tmpID);
+/**
+	Initialize the wireless sensor network of the current user.
+
+  @param tmpID, the user ID currently updating the TAS
+  @param epoch, the epoch of the update
+  @param nodeNum, the total number of sensor nodes in the network
+  @param anchorNum, the total number of anchorNum in the network
+  @param radioRange, the range of each sensor nodes.
+*/
+void setupUser(string tmpID,int epoch,int nodeNum,int anchorNum,int radioRange);
+/**
+	Update the wireless sensor location of the WSN of the current user
+
+  @param tmpID, the user ID currently updating the TAS
+  @param epoch, the epoch of the update
+  @param nodeID, the nodeID we are modifying
+  @param X, x axis of that node
+  @param Y, y axis of that node
+*/
+void configNodes(string tmpID,int epoch,int nodeID,int X,int Y);
+/**
+	Update the routing trajectory in the wireless sensor network of the current user
+
+  @param tmpID, the user ID currently updating the TAS
+  @param epoch, the epoch of the update
+  @param traInd, the trajectory points ID
+  @param X, the x axis value of the current trajectory point
+  @param Y, the y axis value of the current trajectory point
+*/
+void addTrajectory(string tmpID,int epoch,int traInd,int X,int Y);
+
+
+
+/**
+	CUDA kernal that find the newly effective covered area of the current with ellipse.
+	The goOver kernal use the result from the first kernal 'bestEllipse'
+
+  @param n, the total number of ellipses need to be calculated
+  @param data, the ellipses used on calculation
+  @param area, the TAS in format [x1,y1,x2,y2,...., xm,ym] 
+  @param m, the number of points in the TAS
+*/
+__global__ void goOver3(int n, ellipseTrial *data, float *area,int m){
+    int index = threadIdx.x+blockIdx.x*blockDim.x;
+    int stride=blockDim.x*gridDim.x;
+    for(int k=index;k<n;k+=stride){
+        float x = data[k].c3X;
+        float y = data[k].c3Y;
+        float r = data[k].h3 * data[k].avgD2;
+        float a = data[k].ah * data[k].avgD1;
+        
+        float h1x = data[k].c1X;
+        float h1y = data[k].c1Y;
+        float h2x = data[k].c2X;
+        float h2y = data[k].c2Y;
+        
+        float rr = r*r;
+        float a2 = (data[k].ah-1.0)*data[k].avgD1;
+        float total =0.0;
+        
+        for(int l = 0; l<m;){
+            float i = area[l++];
+            float j = area[l++];
+            float tt = sqrtf((i-h1x)*(i-h1x)+(j-h1y)*(j-h1y))+sqrtf((i-h2x)*(i-h2x)+(j-h2y)*(j-h2y));
+            float di = x-i;
+            float dj = y-j;
+            if(di * di + dj * dj <= rr && tt <= 2*a && tt >= 2* a2) total+=1.0;
+        }
+
+        float rate3 = data[k].rate3;
+        data[k].grAr=rate3*total;
+        data[k].acAr = total;
+
+    }
+}
+/**
+	CUDA kernal that find the  effective covered area of the current with ellipse.
+
+  @param n, the total number of ellipses need to be calculated
+  @param data, the ellipses used on calculation
+  @param area, the TAS in format [x1,y1,x2,y2,...., xm,ym] 
+  @param m, the number of points in the TAS
+*/
+__global__ void bestEllipse(int n, ellipseTrial *data, float *area,int m){
+    int index = threadIdx.x+blockIdx.x*blockDim.x;
+    int stride=blockDim.x*gridDim.x;
+    for(int k=index;k<n;k+=stride){
+        float x = data[k].c3X;
+        float y = data[k].c3Y;
+        float r = data[k].h3 * data[k].avgD2;
+        float a = data[k].ah * data[k].avgD1;
+        
+        float h1x = data[k].c1X;
+        float h1y = data[k].c1Y;
+        float h2x = data[k].c2X;
+        float h2y = data[k].c2Y;
+        
+        float rr = r*r;
+        float a2 = (data[k].ah-1.0)*data[k].avgD1;
+        float total =0.0;
+        
+        for(int l = 0; l<m;){
+            float i = area[l++];
+            float j = area[l++];
+            float tt = sqrtf((i-h1x)*(i-h1x)+(j-h1y)*(j-h1y))+sqrtf((i-h2x)*(i-h2x)+(j-h2y)*(j-h2y));
+            float di = x-i;
+            float dj = y-j;
+            if(di * di + dj * dj <= rr && tt <= 2*a && tt >= 2* a2) total+=1.0;
+        }
+        float rate = total / (data[k].tArea+0.1);
+        float rate3 = rate*rate*rate;
+        if ( rate3<1.1){
+            data[k].grAr=rate3*total;
+            data[k].acAr = total;
+            data[k].rate3 = rate3;
+        }
+    }
+}
+
+
+
+/**
+	CUDA kernal that find the newly effective covered area of the current with hyperbola.
+	The goOver kernal use the result from the first kernal 'bestHyper'
+
+  @param n, the total number of hyperbola need to be calculated
+  @param data, the hyperbola used on calculation
+  @param area, the TAS in format [x1,y1,x2,y2,...., xm,ym] 
+  @param m, the number of points in the TAS
+*/
+__global__ void goOver2(int n, hyperTrial *data, float *area,int m){
+    int index = threadIdx.x+blockIdx.x*blockDim.x;
+    int stride=blockDim.x*gridDim.x;
+    for(int k=index;k<n;k+=stride){
+        float x = data[k].c3X;
+        float y = data[k].c3Y;
+        float r = data[k].h3 * data[k].avgD2;
+        float a = data[k].ah * data[k].avgD1;
+        
+        float h1x = data[k].c1X;
+        float h1y = data[k].c1Y;
+        float h2x = data[k].c2X;
+        float h2y = data[k].c2Y;
+        
+        float rr = r*r;
+        float a2 = (data[k].ah-1.0)*data[k].avgD1;
+        float total =0.0;
+        
+        for(int l = 0; l<m;){
+            float i = area[l++];
+            float j = area[l++];
+            float tt = sqrtf((i-h1x)*(i-h1x)+(j-h1y)*(j-h1y))-sqrtf((i-h2x)*(i-h2x)+(j-h2y)*(j-h2y));
+            float di = x-i;
+            float dj = y-j;
+            if(di * di + dj * dj <= rr && tt <= 2*a && tt >= 2* a2) total+=1.0;
+        }
+
+        float rate3 = data[k].rate3;
+        data[k].grAr=rate3*total;
+        data[k].acAr = total;
+
+    }
+}
+/**
+	CUDA kernal that find the newly effective covered area of the current with hyperbola.
+
+  @param n, the total number of hyperbola need to be calculated
+  @param data, the hyperbola used on calculation
+  @param area, the TAS in format [x1,y1,x2,y2,...., xm,ym] 
+  @param m, the number of points in the TAS
+*/
+__global__ void bestHyper(int n, hyperTrial *data, float *area,int m){
+    int index = threadIdx.x+blockIdx.x*blockDim.x;
+    int stride=blockDim.x*gridDim.x;
+    for(int k=index;k<n;k+=stride){
+        float x = data[k].c3X;
+        float y = data[k].c3Y;
+        float r = data[k].h3 * data[k].avgD2;
+        float a = data[k].ah * data[k].avgD1;
+        
+        float h1x = data[k].c1X;
+        float h1y = data[k].c1Y;
+        float h2x = data[k].c2X;
+        float h2y = data[k].c2Y;
+        
+        float rr = r*r;
+        float a2 = (data[k].ah-1.0)*data[k].avgD1;
+        float total =0.0;
+        
+        for(int l = 0; l<m;){
+            float i = area[l++];
+            float j = area[l++];
+            float tt = sqrtf((i-h1x)*(i-h1x)+(j-h1y)*(j-h1y))-sqrtf((i-h2x)*(i-h2x)+(j-h2y)*(j-h2y));
+            float di = x-i;
+            float dj = y-j;
+            if(di * di + dj * dj <= rr && tt <= 2*a && tt >= 2* a2) total+=1.0;
+        }
+        float rate = total / (data[k].tArea +0.1);
+        float rate3 = rate*rate*rate;
+        if ( rate3<1.1){
+            data[k].grAr=rate3*total;
+            data[k].acAr = total;
+            data[k].rate3 = rate3;
+        }
+    }
+}
+
+/**
+	CUDA kernal that find the newly effective covered area of the current with two circles.
+
+  @param n, the total number of circle intersection area need to be calculated
+  @param data, the hyperbola used on calculation
+  @param area, the TAS in format [x1,y1,x2,y2,...., xm,ym] 
+  @param m, the number of points in the TAS
+*/
+__global__ void bestTwoCycle(int n, twoCycleTrial *data, float *area,int m){
+    int index = threadIdx.x+blockIdx.x*blockDim.x;
+    int stride=blockDim.x*gridDim.x;
+    for(int k=index;k<n;k+=stride){
+        float x1=data[k].c1X;
+        float y1=data[k].c1Y;
+        float x2=data[k].c2X;
+        float y2=data[k].c2Y;
+        float r1=data[k].h1*data[k].d;
+        float r2=data[k].h2*data[k].d;
+        float r3=r1-data[k].d;
+        float rr3=r3*r3;
+        float rr1=r1*r1;
+        float rr2=r2*r2;
+        float total=0.0;
+        for(int l=0;l<m;){
+            float i=area[l++];
+            float j=area[l++];
+            float di1=x1-i;
+            float dj1=y1-j;
+            float di2=x2-i;
+            float dj2=y2-j;
+            if (di1*di1+dj1*dj1<=rr1 && di1*di1+dj1*dj1>rr3 && di2*di2+dj2*dj2<=rr2)
+                total+=1.0;
+        }
+        float rate=total / (data[k].tArea+0.1);
+        float rate3=rate*rate*rate;
+        if (rate3<1.1){
+                
+            data[k].grAr=rate3*total ; 
+            data[k].acAr=total;
+            data[k].rate3=rate3;
+        }
+    }    
+
+}
+/**
+	CUDA kernal that find the newly effective covered area of the current with circles.
+	The goOver kernal use the result from the first kernal 'bestTwoCycle'
+
+  @param n, the total number of circle intersection area need to be calculated
+  @param data, the hyperbola used on calculation
+  @param area, the TAS in format [x1,y1,x2,y2,...., xm,ym] 
+  @param m, the number of points in the TAS
+*/
+__global__ void goOver1(int n, twoCycleTrial *data, float *area,int m){
+    int index = threadIdx.x+blockIdx.x*blockDim.x;
+    int stride=blockDim.x*gridDim.x;
+    for(int k=index;k<n;k+=stride){
+        float x1=data[k].c1X;
+        float y1=data[k].c1Y;
+        float x2=data[k].c2X;
+        float y2=data[k].c2Y;
+        float r1=data[k].h1*data[k].d;
+        float r2=data[k].h2*data[k].d;
+        float r3=r1-data[k].d;
+        float rr3=r3*r3;
+        float rr1=r1*r1;
+        float rr2=r2*r2;
+        float total=0.0;
+        for(int l=0;l<m;){
+            float i=area[l++];
+            float j=area[l++];
+            float di1=x1-i;
+            float dj1=y1-j;
+            float di2=x2-i;
+            float dj2=y2-j;
+            if (di1*di1+dj1*dj1<=rr1 && di1*di1+dj1*dj1>rr3 && di2*di2+dj2*dj2<=rr2)
+                total+=1.0;
+        }
+
+        float rate3=data[k].rate3;
+
+        data[k].grAr=rate3*total ; 
+        data[k].acAr=total;
+
+    }    
+
+}
+
+
+int getUser(string tmpID){
+    
+    if(indexMap.find(tmpID)==indexMap.end()){
+        
+        User curUser=User(tmpID);
+        userNow=(userNow+1)%userSize;
+        cout<<"Setting up a new User :"<<tmpID<<" at: "<<userNow<<endl;
+        if(idList[userNow].length()>0)indexMap.erase(idList[userNow]);
+        idList[userNow]=tmpID;
+        indexMap.insert(make_pair(tmpID,userNow));
+        allUser[userNow]=curUser;
+        return userNow;
+    }
+    else{
+        return  indexMap[tmpID];
+    
+    }
+}
+
+void setupUser(string tmpID,int epoch,int nodeNum,int anchorNum,int radioRange)
+{
+    User& curUser = allUser[getUser(tmpID)];
+    //cout<<epoch<<" : "<<curUser.getEpoch()<<endl;
+    if(epoch >= curUser.getEpoch())
+    {
+        curUser.setNodes(nodeNum);
+        curUser.setAnchor(anchorNum);
+        curUser.setEpoch(epoch);
+        curUser.setRange(radioRange);
+        cout<<"setting up user: "<<  tmpID <<" in: "<<getUser(tmpID)<<endl;
+    }
+}
+
+void addTrajectory(string tmpID,int epoch,int traInd, int X,int Y)
+{
+    User& curUser = allUser[getUser(tmpID)];
+    //cout<<epoch<<" : "<<curUser.getEpoch()<<endl;
+    if(epoch >= curUser.getEpoch())
+    {
+        curUser.setEpoch(epoch);
+        curUser.setTraj(X,Y,traInd);
+        
+    }
+}
+
+
+void tcp_client::setupTAS(string tmpID,int epoch, string requestID, int totalStroke)
+{
+    //cout<<"setting TAS"<<endl;
+    User& curUser = allUser[getUser(tmpID)];
+    //cout<<epoch<<" : "<<curUser.getEpoch()<<endl;
+    if(epoch >= curUser.getEpoch() && curUser.resultMap.find(requestID)==curUser.resultMap.end())
+    {
+      //cout<<"push to computing Queue for : " <<tmpID+" "+requestID<<endl;
+      curUser.resultMap.insert(make_pair(requestID,""));
+      curUser.genTAS(totalStroke);
+      computingQueue.push(tmpID+" "+requestID);
+      //cout<<"push to computing Queue for : " <<tmpID+" "+requestID<<endl;
+      //curUser.printArea();
+      
+    }
+    else
+    {
+      cout<<"The computation requestion already in processing"<<endl;
+    
+    }
+}
+
+/**
+	Update the wireless sensor location of the WSN of the current user
+
+  @param tmpID, the user ID currently updating the TAS
+  @param epoch, the epoch of the update
+  @param nodeID, the nodeID we are modifying
+  @param X, x axis of that node
+  @param Y, y axis of that node
+*/
+void configNodes(string tmpID,int epoch,int nodeID,int X,int Y)
+{
+    User& curUser = allUser[getUser(tmpID)];
+    if(epoch >= curUser.getEpoch())
+    {
+        curUser.setX(nodeID,X);
+        curUser.setY(nodeID,Y);
+    }   
+
+
+}
+
+
+/**
+	Key function of the proposed algorithm. 
+	Calculate the routing message with ellipse and hyperbola shapes
+  Function will use the user's current wireless sensor network, the trajectory to calculate
+  the best routing message. 
+  
+  
+  @param userRequest, the user request include the user id, request
+  
+*/
+string getRoutingMSG2(string userRequest)
+{
+    string res="";
+    stringstream ur(userRequest);
+    string tmpID;
+    string requestID;
+    ur>>tmpID;
+    ur>>requestID;
+    User& curUser = allUser[getUser(tmpID)];
+    
+    float *TAS,*d_TAS;
+    int tasSize=curUser.TAS.size();
+    TAS=(float*)malloc(sizeof(float)*tasSize*2);
+    cudaMalloc((void**)&d_TAS, sizeof(float) *tasSize*2);
+    int counter=0;
+    for(string t:curUser.TAS)
+    {
+        stringstream tt(t);
+        float x,y;
+        tt>>x;
+        tt>>y;
+        TAS[counter++]=x;
+        TAS[counter++]=y;
+    }
+    cudaMemcpy(d_TAS, TAS, sizeof(float) *tasSize*2, cudaMemcpyHostToDevice);
+    
+    //cout<<"I'm OK Here"<<endl;
+    short hv[nodeSize][anchorSize];
+    curUser.getHopInfo(hv);
+    vector<ellipseTrial> ellipseTrials=curUser.findEllipseTrial(hv);
+    counter=0; 
+    ellipseTrial *eTri;
+    ellipseTrial *d_eTri;
+    if(!ellipseTrials.empty())
+    {
+        eTri=(ellipseTrial*)malloc(sizeof(ellipseTrial)*ellipseTrials.size());
+        
+        //cout<<"I'm OK after here"<<endl;
+        for(ellipseTrial et: ellipseTrials)
+        {
+            eTri[counter++]=et;
+        }
+        cudaMalloc((void**)&d_eTri, sizeof(ellipseTrial) * ellipseTrials.size());
+        cudaMemcpy(d_eTri,eTri,sizeof(ellipseTrial) * ellipseTrials.size(),cudaMemcpyHostToDevice);
+        cout<<"finish copy totoal trial: "<<ellipseTrials.size()<<endl;        
+        bestEllipse<<<2048,256>>>(ellipseTrials.size(),d_eTri,d_TAS,tasSize*2);
+       
+        //cudaFree(d_cTri);
+    }
+    vector<hyperTrial> hyperTrials=curUser.findHyperTrial(hv);   
+    //cout<<"number of hyperTrial: "<<hyperTrials.size()<<endl;
+    hyperTrial *hTri;
+    hyperTrial *d_hTri;
+    int counter2=0;
+    cudaDeviceSynchronize();
+    if(!hyperTrials.empty())
+    {
+        hTri=(hyperTrial*)malloc(sizeof(hyperTrial)*hyperTrials.size());
+
+        //cout<<"I'm OK after here"<<endl;
+        for(hyperTrial ht: hyperTrials)
+        {
+            hTri[counter2++]=ht;
+        }
+        cudaMalloc((void**)&d_hTri, sizeof(hyperTrial) *hyperTrials.size());        
+        cudaMemcpy(d_hTri,hTri,sizeof(hyperTrial) *hyperTrials.size(),cudaMemcpyHostToDevice);
+        cout<<"finish copy totoal trial: "<<hyperTrials.size()<<endl;
+        cout<<"********TAS size is: "<<tasSize<<"******"<<endl;
+        bestHyper<<<2048,256>>>(hyperTrials.size(),d_hTri,d_TAS,tasSize*2);
+        //cudaDeviceSynchronize();
+        
+        //cudaFree(d_hTri);
+    }
+    
+    if(ellipseTrials.empty() || hyperTrials.empty())return "No result";
+    cudaDeviceSynchronize();
+    cudaMemcpy(eTri,d_eTri,sizeof(ellipseTrial) *ellipseTrials.size(),cudaMemcpyDeviceToHost); 
+    cudaMemcpy(hTri,d_hTri,sizeof(hyperTrial) *hyperTrials.size(),cudaMemcpyDeviceToHost);  
+      
+    cout<<counter<<" ||||||| "<<counter2<<" ||||||||||  "<<tasSize<<endl;
+    res+=findBestTry2(eTri,hTri, counter, counter2, curUser.TAS);
+    
+    sort(eTri, eTri+counter, sortEllipseTrial);
+    sort(hTri, hTri+counter2, sortHyperTrial);
+    counter = 5000000 < counter ? 5000000 : counter;
+    counter2 = 5000000 < counter2 ? 5000000 : counter2;
+    
+    
+    //cudaMalloc((void**)&d_cTri, sizeof(twoCycleTrial) *counter);
+    cudaMemcpy(d_eTri,eTri,sizeof(ellipseTrial) *counter, cudaMemcpyHostToDevice);
+    //cudaMalloc((void**)&d_hTri, sizeof(hyperTrial) *counter2);  
+    cudaMemcpy(d_hTri,hTri,sizeof(hyperTrial) *counter2, cudaMemcpyHostToDevice);
+    //cout<<"copy to device again"<<endl;
+    int newSize = curUser.TAS.size();
+    cout<<"new TAS SIZE is: "<<newSize<<"; old TAS size is"<<tasSize<<endl;
+    while(newSize>0.15*tasSize)
+    {
+      
+      newSize=curUser.TAS.size();
+      cout<<counter<<" ||||||| "<<counter2<<" ||||||||||  "<<newSize<<endl;
+      int tasInd=0;
+      for(string t:curUser.TAS)
+      {
+          stringstream tt(t);
+          float x,y;
+          tt>>x;
+          tt>>y;
+          TAS[tasInd++]=x;
+          TAS[tasInd++]=y;
+      }
+      //cudaFree(d_TAS);
+      //cudaMalloc((void**)&d_TAS, sizeof(float) *newSize*2);
+      cudaMemcpy(d_TAS, TAS, sizeof(float) *newSize*2, cudaMemcpyHostToDevice);
+      goOver3<<<2048,256>>>(counter, d_eTri, d_TAS, newSize*2);
+      goOver2<<<2048,256>>>(counter2, d_hTri, d_TAS, newSize*2);
+      cudaDeviceSynchronize();
+      
+      //free(cTri);
+      //free(hTri);
+      //cTri=(twoCycleTrial*)malloc(sizeof(twoCycleTrial)*counter);
+      //hTri=(hyperTrial*)malloc(sizeof(hyperTrial)*counter2);
+      cudaMemcpy(eTri,d_eTri,sizeof(ellipseTrial) *counter,cudaMemcpyDeviceToHost);  
+      cudaMemcpy(hTri,d_hTri,sizeof(hyperTrial) *counter2,cudaMemcpyDeviceToHost);
+      res+=findBestTry2(eTri,hTri, counter, counter2, curUser.TAS);
+    }
+    
+    for(string t:curUser.TAS)
+    {
+      cout<<t<<";";
+    }
+    cout<<endl;
+    cudaFree(d_eTri);
+    cudaFree(d_hTri);
+    cudaFree(d_TAS);
+    free(TAS);
+    free(eTri); 
+    free(hTri);
+    
+    cout<<"sending back result!!!!!!!!!!!!!!!"<<endl;     
+    return res;
+
+}
+
+/**
+	Key function of the proposed algorithm. 
+	Calculate the routing message with two circle and hyperbola shapes
+  Function will use the user's current wireless sensor network, the trajectory to calculate
+  the best routing message. 
+  
+  
+  @param userRequest, the user request include the user id, request
+  
+*/
+string getRoutingMSG(string userRequest)
+{
+    string res="";
+    stringstream ur(userRequest);
+    string tmpID;
+    string requestID;
+    ur>>tmpID;
+    ur>>requestID;
+    User& curUser = allUser[getUser(tmpID)];
+    
+    float *TAS,*d_TAS;
+    int tasSize=curUser.TAS.size();
+    TAS=(float*)malloc(sizeof(float)*tasSize*2);
+    cudaMalloc((void**)&d_TAS, sizeof(float) *tasSize*2);
+    int counter=0;
+    for(string t:curUser.TAS)
+    {
+        stringstream tt(t);
+        float x,y;
+        tt>>x;
+        tt>>y;
+        TAS[counter++]=x;
+        TAS[counter++]=y;
+    }
+    cudaMemcpy(d_TAS, TAS, sizeof(float) *tasSize*2, cudaMemcpyHostToDevice);
+    
+    //cout<<"I'm OK Here"<<endl;
+    short hv[nodeSize][anchorSize];
+    curUser.getHopInfo(hv);
+    vector<twoCycleTrial> cycleTrials=curUser.findTwoCycleTrial(hv);
+    counter=0; 
+    twoCycleTrial *cTri;
+    twoCycleTrial *d_cTri;
+    if(!cycleTrials.empty())
+    {
+        cTri=(twoCycleTrial*)malloc(sizeof(twoCycleTrial)*cycleTrials.size());
+        
+        //cout<<"I'm OK after here"<<endl;
+        for(twoCycleTrial ct: cycleTrials)
+        {
+            cTri[counter++]=ct;
+        }
+        cudaMalloc((void**)&d_cTri, sizeof(twoCycleTrial) *cycleTrials.size());
+        cudaMemcpy(d_cTri,cTri,sizeof(twoCycleTrial) *cycleTrials.size(),cudaMemcpyHostToDevice);
+        cout<<"finish copy totoal trial: "<<cycleTrials.size()<<endl;        
+        bestTwoCycle<<<2048,256>>>(cycleTrials.size(),d_cTri,d_TAS,tasSize*2);
+       
+        //cudaFree(d_cTri);
+    }
+    vector<hyperTrial> hyperTrials=curUser.findHyperTrial(hv);   
+    //cout<<"number of hyperTrial: "<<hyperTrials.size()<<endl;
+    hyperTrial *hTri;
+    hyperTrial *d_hTri;
+    int counter2=0;
+    if(!hyperTrials.empty())
+    {
+        hTri=(hyperTrial*)malloc(sizeof(hyperTrial)*hyperTrials.size());
+
+        //cout<<"I'm OK after here"<<endl;
+        for(hyperTrial ht: hyperTrials)
+        {
+            hTri[counter2++]=ht;
+        }
+        cudaMalloc((void**)&d_hTri, sizeof(hyperTrial) *hyperTrials.size());        
+        cudaMemcpy(d_hTri,hTri,sizeof(hyperTrial) *hyperTrials.size(),cudaMemcpyHostToDevice);
+        cout<<"finish copy totoal trial: "<<hyperTrials.size()<<endl;
+        cout<<"********TAS size is: "<<tasSize<<"******"<<endl;
+        bestHyper<<<2048,256>>>(hyperTrials.size(),d_hTri,d_TAS,tasSize*2);
+        //cudaDeviceSynchronize();
+        
+        //cudaFree(d_hTri);
+    }
+    
+    if(cycleTrials.empty() || hyperTrials.empty())return "No result";
+    cudaDeviceSynchronize();
+    cudaMemcpy(cTri,d_cTri,sizeof(twoCycleTrial) *cycleTrials.size(),cudaMemcpyDeviceToHost); 
+    cudaMemcpy(hTri,d_hTri,sizeof(hyperTrial) *hyperTrials.size(),cudaMemcpyDeviceToHost);  
+      
+    cout<<counter<<" ||||||| "<<counter2<<" ||||||||||  "<<tasSize<<endl;
+    res+=findBestTry(cTri,hTri, counter, counter2, curUser.TAS);
+    
+    sort(cTri, cTri+counter, sortCycleTrial);
+    sort(hTri, hTri+counter2, sortHyperTrial);
+    counter = 1000000 < counter ? 1000000 : counter;
+    counter2 = 5000000 < counter2 ? 5000000 : counter2;
+    
+    
+    //cudaMalloc((void**)&d_cTri, sizeof(twoCycleTrial) *counter);
+    cudaMemcpy(d_cTri,cTri,sizeof(twoCycleTrial) *counter, cudaMemcpyHostToDevice);
+    //cudaMalloc((void**)&d_hTri, sizeof(hyperTrial) *counter2);  
+    cudaMemcpy(d_hTri,hTri,sizeof(hyperTrial) *counter2, cudaMemcpyHostToDevice);
+
+    int newSize = 0;
+    do
+    {
+      
+      newSize=curUser.TAS.size();
+      cout<<counter<<" ||||||| "<<counter2<<" ||||||||||  "<<newSize<<endl;
+      int tasInd=0;
+      for(string t:curUser.TAS)
+      {
+          stringstream tt(t);
+          float x,y;
+          tt>>x;
+          tt>>y;
+          TAS[tasInd++]=x;
+          TAS[tasInd++]=y;
+      }
+      //cudaFree(d_TAS);
+      //cudaMalloc((void**)&d_TAS, sizeof(float) *newSize*2);
+      cudaMemcpy(d_TAS, TAS, sizeof(float) *newSize*2, cudaMemcpyHostToDevice);
+      goOver1<<<2048,256>>>(counter, d_cTri, d_TAS, newSize*2);
+      goOver2<<<2048,256>>>(counter2, d_hTri, d_TAS, newSize*2);
+      cudaDeviceSynchronize();
+      
+      //free(cTri);
+      //free(hTri);
+      //cTri=(twoCycleTrial*)malloc(sizeof(twoCycleTrial)*counter);
+      //hTri=(hyperTrial*)malloc(sizeof(hyperTrial)*counter2);
+      cudaMemcpy(cTri,d_cTri,sizeof(twoCycleTrial) *counter,cudaMemcpyDeviceToHost);  
+      cudaMemcpy(hTri,d_hTri,sizeof(hyperTrial) *counter2,cudaMemcpyDeviceToHost);
+      res+=findBestTry(cTri,hTri, counter, counter2, curUser.TAS);
+    }while(newSize>0.15*tasSize);
+    
+    cudaFree(d_cTri);
+    cudaFree(d_hTri);
+    cudaFree(d_TAS);
+    free(TAS);
+    free(cTri); 
+    free(hTri);     
+    return res;
+
+}
+
+
+void tcp_client::addData(string data)
+{
+    int begin=data.find("*,");
+    int end=data.find(",*",begin+1);
+    //cout<<data<<endl;
+    if(begin>=0&&end>begin)
+    {
+        string realData=data.substr(begin+2,end-begin-2);
+
+        int length=realData.length();
+        int comma=0;
+        for(int i=0;i<length;i++){
+            if(realData[i]==',')comma++;
+        }
+        //cout<<realData<<endl;
+        if(comma==5){
+            int first=realData.find(",");
+            string tmpID=realData.substr(0,first);
+            //cout<<tmpID.length()<<endl;
+            if(tmpID.length()!=8 || tmpID.find("0.") == string::npos )return;
+            
+            int second=realData.find(",",first+1);
+            int third=realData.find(",",second+1);
+            int fourth=realData.find(",",third+1);
+            int fifth=realData.find(",",fourth+1);
+            
+            int epoch=myStoi(realData.substr(first+1,second-first));
+            int mod=myStoi(realData.substr(second+1,third-second));
+            //cout<<mod<<endl;
+            if(mod==0){
+            
+                int nodeNum=myStoi(realData.substr(third+1,fourth-third));
+                int anchorNum=myStoi(realData.substr(fourth+1,fifth-fourth));
+                int radioRange=myStoi(realData.substr(fifth+1,length-fourth));
+                //cout<<"0: "<<tmpID<<":"<<epoch<<endl;
+              if(nodeNum<nodeSize&&anchorNum<anchorSize&&radioRange<=200&&nodeNum>0&&anchorNum>0&&radioRange>0)
+                setupUser(tmpID,epoch,nodeNum,anchorNum,radioRange);
+            }
+            if(mod==1){
+                int nodeID=myStoi(realData.substr(third+1,fourth-third));
+                int X=myStoi(realData.substr(fourth+1,fifth-fourth));
+                int Y=myStoi(realData.substr(fifth+1,length-fourth));
+              if(nodeID<nodeSize&&nodeID>=0)  
+                configNodes(tmpID,epoch,nodeID,X,Y);
+            }
+            if(mod==3){
+                int traInd=myStoi(realData.substr(third+1,fourth-third));
+                int X=myStoi(realData.substr(fourth+1,fifth-fourth));
+                int Y=myStoi(realData.substr(fifth+1,length-fourth));
+              if(traInd<strokeSize&&traInd>=0)
+                addTrajectory(tmpID,epoch,traInd,X,Y);
+            }
+            if(mod==4){
+                //cout<<"third: "<<third<<"fourth: "<<fourth<<endl;
+                string requestID=realData.substr(third+1,fourth-third-1);
+                int totalStroke=myStoi(realData.substr(fourth+1,fifth-fourth));
+                if(totalStroke<strokeSize)
+                {
+                    cout<<"request realDATA "<<realData<<endl;
+                    cout<<"here is the requestID "<<requestID<<endl;
+                    setupTAS(tmpID,epoch,requestID, totalStroke);
+                }
+            
+            }
+            
+            
+
+        }
+
+    }
+    else
+    {
+        //cout<<"here is nonesense: "<<data<<endl;
+    
+    
+    }
+
+}
+
+/**
+	Connect to a host on a certain port number
+*/
+bool tcp_client::conn(string address , int port)
+{
+	//create socket if it is not already created
+	if(sock == -1)
+	{
+		//Create socket
+		sock = socket(AF_INET , SOCK_STREAM , 0);
+		if (sock == -1)
+		{
+			perror("Could not create socket");
+		}
+		
+		cout<<"Socket created\n";
+	}
+	else	{	/* OK , nothing */	}
+	
+	//setup address structure
+	if(inet_addr(address.c_str()) == -1)
+	{
+		struct hostent *he;
+		struct in_addr **addr_list;
+		
+		//resolve the hostname, its not an ip address
+		if ( (he = gethostbyname( address.c_str() ) ) == NULL)
+		{
+			//gethostbyname failed
+			herror("gethostbyname");
+			cout<<"Failed to resolve hostname\n";
+			
+			return false;
+		}
+		
+		//Cast the h_addr_list to in_addr , since h_addr_list also has the ip address in long format only
+		addr_list = (struct in_addr **) he->h_addr_list;
+
+		for(int i = 0; addr_list[i] != NULL; i++)
+		{
+			//strcpy(ip , inet_ntoa(*addr_list[i]) );
+			server.sin_addr = *addr_list[i];
+			
+			cout<<address<<" resolved to "<<inet_ntoa(*addr_list[i])<<endl;
+			
+			break;
+		}
+	}
+	
+	//plain ip address
+	else
+	{
+		server.sin_addr.s_addr = inet_addr( address.c_str() );
+	}
+	
+	server.sin_family = AF_INET;
+	server.sin_port = htons( port );
+	
+	//Connect to remote server
+	if (connect(sock , (struct sockaddr *)&server , sizeof(server)) < 0)
+	{
+		perror("connect failed. Error");
+		return 1;
+	}
+	
+	cout<<"Connected\n";
+	return true;
+}
+
+/**
+	Send data to the connected host
+*/
+bool tcp_client::send_data(string data)
+{
+	//Send some data
+	if( send(sock , data.c_str() , strlen( data.c_str() ) , 0) < 0)
+	{
+		perror("Send failed : ");
+		return false;
+	}
+	
+	return true;
+}
+
+/**
+	Receive data from the connected host
+*/
+void tcp_client::receive(char buffer[])
+{
+	
+	buffer[0]=' ';
+
+
+	
+	//Receive a reply from the server
+	if( recv(sock , buffer , 1024 , 0) < 0)
+	{
+		puts("recv failed");
+	
+    }
+    string to;
+    stringstream ss(buffer);
+    if(buffer!=NULL)
+    {
+        while(getline(ss,to,'\n')){
+            stringQueue.push(to);
+        }
+	}
+
+    
+	receive(buffer);
+}
+
+
+
+void tcp_client::repeatSend()
+{
+
+    unsigned long  counter=0;
+    while(1)
+    {
+        
+        send_data(to_string(counter++));
+        this_thread::sleep_for(chrono::milliseconds(5000));   
+    }
+
+}
+
+
+void tcp_client::listenString()
+{
+    
+    while(1)
+    {
+        
+        
+        if(!stringQueue.isEmpty())
+        {
+            
+            string popString=stringQueue.pop();
+            addData(popString);
+            
+        }
+        this_thread::sleep_for(chrono::microseconds(100));   
+    }
+}
+
+
+void tcp_client::computationQueueHandle()
+{
+  while(1)
+  {
+    if(!computingQueue.isEmpty())
+    {
+        
+        string popString=computingQueue.pop();
+        if(popString.size()> 10){
+            cout<<"computing "<<popString<<endl;
+            string res=getRoutingMSG2(popString); 
+            cout<<"======Result: "<<res<<endl;
+            send_data(popString+res); 
+            send_data(popString+res);           
+        }
+
+        
+    }
+    this_thread::sleep_for(chrono::microseconds(100));   
+  }
+}
+
+
+//start the client and listen to the server.
+int main(int argc , char *argv[])
+{  
+  srand(time(NULL));
+	tcp_client  c ;
+	string host="131.151.90.204";  
+	
+	//connect to host
+	c.conn(host , 7676);
+  thread stringListeningThread(&tcp_client::listenString, &c);	
+  thread hh(&tcp_client::repeatSend,&c);
+  thread cq(&tcp_client::computationQueueHandle,&c);
+	//receive and echo reply
+	char buffer[4096];
+	c.receive(buffer);
+
+	return 0;
+}
+ 
+ 
+ 

@@ -13,9 +13,7 @@
  *   ( http://www.gnu.org/licenses/gpl-3.0.en.html )                       *
  *									   *
  *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ *   along with this program; If not, see <https://www.gnu.org/licenses/>. *
  ***************************************************************************/
 #ifndef HYPERTRIAL_H
 #define HYPERTRIAL_H
@@ -27,26 +25,50 @@
 #include "Point.h"
 using namespace std;
 
-
+//!A hyperbola and cycle constraints. 
+/**
+  
+  It contains hyperbola and cycle information including the mathematic overlapping area.
+  Detail about geometry constraints can be seen in:
+  https://ieeexplore.ieee.org/abstract/document/8935061
+*/
 struct hyperTrial
 {
+  ///left focus ID of the hyperbola
   int c1ID;
+  ///right focus ID of the hyperbola
   int c2ID;
+  /// center ID of the circle
   int c3ID; 
+  ///x coordinate of left focus of the hyperbola
   float c1X;
+  ///y coordinate of left focus of the hyperbola
   float c1Y;
+  ///x coordinate of right focus of the hyperbola
   float c2X;
+  ///y coordinate of right focus of the hyperbola
   float c2Y;
+  ///x coordinate of center of the circle
   float c3X;
+  ///y coordinate of center of the circle
   float c3Y;  
+  ///hop difference between a point in the hyperbola to left circle and right circle
   float ah;
+  ///radius of the circle in hops
   float h3;
+  ///average one hop distance in pixel for ah
   float avgD1;
+  ///average one hop distance in pixel for h3
   float avgD2;
+  ///mathematic calculated overlapping area of hyperbola and circle
   float tArea;
+  /// rate3 * acAr
   float grAr;
+  /// (acAr / tArea)^3
   float rate3;
+  ///tested overlapping area of hyperbola and circle and TAS
   float acAr;
+  //debugging attributes for CUDA program
   float yroot[8];
 };
 
