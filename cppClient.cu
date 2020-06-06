@@ -51,19 +51,19 @@
 
 using namespace std;
 
+//!TCP Client class
 /**
-	TCP Client class
+	A c++ TCP client that connect to TCP server.
+	The goal of this service is to handle computational request.
+	Encoding routing trajectory as the user request.
 */
-
-
-
 class tcp_client
 {
 	private:
-		int sock;
-		std::string address;
-		int port;
-		struct sockaddr_in server;
+		int sock; ///<sock value
+		std::string address;///<ip address of the server
+		int port; ///<port of the connection of server
+		struct sockaddr_in server;  ///<A server instance
 		
 		
 		
@@ -72,10 +72,8 @@ class tcp_client
 		  Initialize tcp client
 		*/
 		tcp_client();
-		//thread safe queue for input from server
-		Queue<string> stringQueue;
-		//thread safe queue for computation request
-		Queue<string> computingQueue;
+		Queue<string> stringQueue;///<thread safe queue for input from server.
+		Queue<string> computingQueue;///<thread safe queue for computation request
 		/**
 		  Returns if the connection success
 
@@ -84,11 +82,11 @@ class tcp_client
 		  @return if connection established
 		*/
 		bool conn(string, int);
-		//create a thread that listening to the server message queue
+		///create a thread that listening to the server message queue
 		void listenString();
-		//create a thread that repeatly send a heartbeat message to the server
+		///create a thread that repeatly send a heartbeat message to the server
 		void repeatSend();
-		//create a thread that listen to the computation request queue
+		///create a thread that listen to the computation request queue
 		void computationQueueHandle();
 		/**
 		  Returns if sent data to the server successfully
@@ -103,12 +101,11 @@ class tcp_client
 		*/
 		void addData(string data);
 		/**
-    Update the Trajectory area set of the wireless sensor networks(TAS)
-
-		  @param tmpID, the user ID currently updating the TAS
-		  @param epoch, the epoch of the update
-		  @param requestID, the request ID for that user
-		  @param totalStroke, the total length of the trajectory in # of strokes
+      Update the Trajectory area set of the wireless sensor networks(TAS).
+		  @param tmpID The user ID currently updating the TAS
+		  @param epoch The epoch of the update
+		  @param requestID The request ID for that user
+		  @param totalStroke The total length of the trajectory in # of strokes
 		*/
 		void setupTAS(string tmpID,int epoch, string requestID,int totalStroke);
 		//listening to the port and receive TCP/IP packets and store in the buf.
