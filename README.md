@@ -20,6 +20,7 @@ The front end is in another project which is a coorperate project with my underg
 The NodeJS server is sololy writen by me.
 
 In Linux with cuda installed.
+
 compile: nvcc *.cu *.cpp -o client
 
 To run: sh autorestart.sh
