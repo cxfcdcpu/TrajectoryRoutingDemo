@@ -17,7 +17,8 @@ The detailed usage tutorial is shown in the pdf file:
 
 This github project only have the client part. It can be used as a GPU client that handel the computation load of encoding trajectory.
 The front end is in another project which is a coorperate project with my undergraduate student Jimmy Lin
-The NodeJS server is sololy writen by me.
+The NodeJS server and WSN simulation program is sololy writen by me. check out this project:
+https://github.com/cxfcdcpu/RoutingDemoServer
 
 In Linux with cuda installed.
 
