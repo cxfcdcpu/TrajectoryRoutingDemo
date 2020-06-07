@@ -21,6 +21,7 @@ The NodeJS server is sololy writen by me.
 
 In Linux with cuda installed.
 compile: nvcc *.cu *.cpp -o client
+
 To run: sh autorestart.sh
 
 ## Document
