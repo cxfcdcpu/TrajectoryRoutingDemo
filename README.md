@@ -3,6 +3,8 @@
 The demo is shown in  2019 IEEE 38th Symposium on Reliable Distributed Systems (SRDS). The link of the demo paper is here: [A Testbed for Data Routing in Low-Power WSNs using DV-Hop Based Trajectory Encoding Algorithm](https://ieeexplore.ieee.org/document/9049569)
 The current working demo is here: http://routing-demos.com:8080/
 
+The server backend, frontend, and simulation program are in my another [repository](https://github.com/cxfcdcpu/RoutingDemoServer).
+
 ## System overview and UML model
 As my GPU server is in the lab where I can't connect without using TCP socket, So I use the consumer and producer archetecture that using a server that connect to the user as well as the GPU server. It connect to user with nodeJS web server and connec to GPU server with the NodeJs TCP server. The UML model is shown below:
 ![systemModel](https://github.com/cxfcdcpu/TrajectoryRoutingDemo/blob/master/TrajectoryEncodingDemoOverview.PNG)
